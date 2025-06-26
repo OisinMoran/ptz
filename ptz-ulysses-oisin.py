@@ -2,6 +2,7 @@ import time
 import RPi.GPIO as GPIO
 from PCA9685 import PCA9685
 from picamera2 import Picamera2
+from libcamera import controls
 import cv2
 import numpy as np
 import copy
@@ -33,9 +34,15 @@ current_tilt = TIL_CENTRE
 picam2 = Picamera2()
 config = picam2.create_video_configuration(
     main={"format": "RGB888", "size": (IMG_WIDTH, IMG_HEIGHT)},
-    controls={"FrameDurationLimits": (50000, 50000)},  # 20 FPS
+    controls={
+        "FrameDurationLimits": (50000, 50000),  # 20 FPS
+        "AfMode": controls.AfModeEnum.Continuous,
+        "AfSpeed": controls.AfSpeedEnum.Fast,
+        "AfWindows": [(CENTRE_X - 100, CENTRE_Y - 100, 200, 200)],
+    },
 )
 picam2.configure(config)
+picam2.set_controls({})
 picam2.start()
 
 
@@ -48,15 +55,16 @@ def zoom_at(img, zoom=1, angle=0, coord=None):
 
 # prop constants
 p_x, p_y = 0.02, -0.02
+x_tol, y_tol = 0.5, 0.5
 
 while True:
     frame = picam2.capture_array()
     b = frame[..., 0]
     g = frame[..., 1]
     r = frame[..., 2]
-    pen_b = np.where(40 <= b, 255, 0) & np.where(b <= 180, 255, 0)
-    pen_g = np.where(50 <= g, 255, 0)
-    pen_r = np.where(0 <= r, 255, 0) & np.where(r <= 40, 255, 0)
+    pen_b = np.where(40 <= b, 255, 0) & np.where(b <= 160, 255, 0)
+    pen_g = np.where(60 <= g, 255, 0)
+    pen_r = np.where(0 <= r, 255, 0) & np.where(r <= 30, 255, 0)
     pen = pen_b & pen_g & pen_r
     # Dilate, open/close etc.
     kernel = np.ones((5, 5), np.uint8)
@@ -69,6 +77,7 @@ while True:
     biggest_area, biggest_comp = -1, -1
     biggest_stat = -1, -1, -1, -1
     b_x, b_y, b_w, b_h = -1, -1, -1, -1
+    x, y, w, h = 1, 1, 1, 1
     for i in range(1, numLabels):
         # extract the connected component statistics for the current
         # label
@@ -82,8 +91,8 @@ while True:
             biggest_comp = i
             b_x, b_y, b_w, b_h = x, y, w, h
     _ = cv2.rectangle(frame, (b_x, b_y), (b_x + b_w, b_y + b_h), (0, 255, 0), 1)
-    zoom = max(0.2 * min(IMG_WIDTH / w, IMG_HEIGHT / h), 1)
-    zoomed_frame = zoom_at(frame, zoom=zoom, coord=centroids[biggest_comp])
+    zoom = min(max(0.2 * min(IMG_WIDTH / w, IMG_HEIGHT / h), 1), 10)
+    zoomed_frame = zoom_at(frame, zoom=zoom)  # , coord=centroids[biggest_comp])
     _ = cv2.putText(
         zoomed_frame,
         f"Zoom: {zoom:.1f}",
@@ -96,10 +105,13 @@ while True:
     centroid_x, centroid_y = centroids[biggest_comp]
     x_err = CENTRE_X - centroid_x
     y_err = CENTRE_Y - centroid_y
-    current_pan = max(min(current_pan + p_x * x_err, PAN_MAX), PAN_MIN)
-    pwm.setRotationAngle(PAN, current_pan)
-    current_tilt = max(min(current_tilt + p_y * y_err, TIL_MAX), TIL_MIN)
-    pwm.setRotationAngle(TIL, current_tilt)
+    print(x_err, y_err)
+    if abs(x_err) > x_tol:
+        current_pan = max(min(current_pan + p_x * x_err, PAN_MAX), PAN_MIN)
+        pwm.setRotationAngle(PAN, current_pan)
+    if abs(y_err) > y_tol:
+        current_tilt = max(min(current_tilt + p_y * y_err, TIL_MAX), TIL_MIN)
+        pwm.setRotationAngle(TIL, current_tilt)
     cv2.imshow("Frame", zoomed_frame)
     if cv2.waitKey(1) == ord("q"):
         break
