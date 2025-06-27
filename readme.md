@@ -3,6 +3,8 @@ A Pan Tilt Zoom object tracking camera that can update what it's tracking on the
 
 The best way to view and ✨ _interact_ ✨ with this (when it's on) is at [REDACTED]. Just let me know when you want me to turn it on and I'll give you the wonderful, surprisingly short URL. You can even select what type of thing you'd like to track!
 
+**Files:** `ptz-local.py` is a version that just does the tracking, `ptz-stream.py` also streams the results to the internet, and `old-school-cv.py` was an initial test of zoom, motionless tracking, and then the servos.
+
 ## POV: your pirate gums have begun to bleed and I am tempting you with an orange // Results
 
 ![ezgif-1274c64c35e02c](https://github.com/user-attachments/assets/b6482efa-af75-43d2-b8a4-9d8669c886cb)
@@ -33,12 +35,12 @@ Picture | Name | Cost
 
 
 ## Software Process
-**1.** Got some simple oldschool CV working initially to get digital zoom and tracking working without servo movement  
+**1.** Got some simple oldschool CV working initially to get digital zoom and tracking working without servo movement (`old-school-cv.py`)   
 **2.** Used this simple and speedy setup to get the servos working with a simple proportional controller  
 **3.** Got YOLO working on its own  
 **4.** Integrated YOLO into the tracking  
-**5–37.** Tuning, tweaking, experimenting  
-**38.** Set up streaming site using Flask & ngrok
+**5–37.** Tuning, tweaking, experimenting (`ptz-local.py`)  
+**38.** Set up streaming site using Flask & ngrok (`ptz-stream.py`)
 
 ## Final Architecture & Specs Summary
 - Choice of object tracked by YOLO (~100ms inference), and OpenCV's TrackerCSRT (~5ms "inference") (the latter is much faster but takes its cue of what to track from YOLO's detection)
