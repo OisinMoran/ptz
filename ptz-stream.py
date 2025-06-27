@@ -281,6 +281,7 @@ while True:
             pwm.setServoPulse(
                 TIL, angle_to_pulse(current_tilt, min_us=800, max_us=2200)
             )
+    frame_count += 1
 
     # Display
     with frame_lock:

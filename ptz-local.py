@@ -17,6 +17,7 @@ model = YOLO("yolo11n.pt")
 
 # Global variable for class
 TRACKED_CLASS = 49  # default to "orange"
+TRACKED_CLASS = 39  # default to "bottle"
 
 # PAN (0-180) ~ CENTRED 90
 PAN_MIN, PAN_MAX = 10, 170
@@ -124,7 +125,8 @@ while True:
 
             # Start more light-weight tracker
             bbox = (x_1, y_1, w, h)
-            tracker = cv2.TrackerKCF_create()
+            # tracker = cv2.TrackerKCF_create()
+            tracker = cv2.TrackerCSRT_create()
             tracker.init(frame, bbox)
             tracker_active = True
         else:
@@ -133,7 +135,9 @@ while True:
 
     elif tracker_active:
         # DETECT LIGHTWEIGHT
+        pre_tracker = time.time()
         tracker_success, bbox = tracker.update(frame)
+        print("TRACKER TIME: ", time.time() - pre_tracker)
         if tracker_success:
             x, y, w, h = [int(v) for v in bbox]
             centroid_x = x + w // 2
@@ -194,6 +198,7 @@ while True:
             pwm.setServoPulse(
                 TIL, angle_to_pulse(current_tilt, min_us=800, max_us=2200)
             )
+    frame_count += 1
 
     # Display
     cv2.imshow("Camera", frame)
