@@ -6,7 +6,7 @@ The best way to view and ✨ _interact_ ✨ with this (when it's on) is at [REDA
 **Files:**  
 `ptz-local.py` is a version that just does the tracking,  
 `ptz-stream.py` also streams the results to the internet, 
-`old-school-cv.py` was an initial test of zoom, motionless tracking, and then the servos, and
+`old-school-cv.py` was an initial test of zoom, motionless tracking, and then the servos, and  
 `demo.mp4` is a video demo of a ~10 FPS run, showing object, camera, and camera's view.
 
 ## POV: your pirate gums have begun to bleed and I am tempting you with an orange // Results
