@@ -3,7 +3,7 @@ A Pan Tilt Zoom object tracking camera that can update what it's tracking on the
 
 The best way to view and ✨ _interact_ ✨ with this (when it's on) is at [REDACTED]. Just let me know when you want me to turn it on and I'll give you the wonderful, surprisingly short URL. You can even select what type of thing you'd like to track!
 
-Files: `ptz-local.py` is a version that just does the tracking, `ptz-stream.py` also streams the results to the internet, and `old-school-cv.py` was an initial test of zoom, motionless tracking, and then the servos.
+**Files:** `ptz-local.py` is a version that just does the tracking, `ptz-stream.py` also streams the results to the internet, and `old-school-cv.py` was an initial test of zoom, motionless tracking, and then the servos.
 
 ## POV: your pirate gums have begun to bleed and I am tempting you with an orange // Results
 
