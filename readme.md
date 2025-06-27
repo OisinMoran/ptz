@@ -1,5 +1,5 @@
 # PTZ Object Tracking Camera
-A Pan Tilt Zoom object tracking camera that can update what it's tracking on the fly. Using a combination of the lightweight YOLO 11 model, and even-lighter-weight tradional CV, it gets over 20 FPS tracking on 480 x 320 video.
+A Pan Tilt Zoom object tracking camera that can update what it's tracking on the fly. Using a combination of the lightweight YOLO 11 model, and even-lighter-weight traditional CV, it gets over 20 FPS tracking on 480 x 320 video.
 
 The best way to view and ✨ _interact_ ✨ with this (when it's on) is at [REDACTED]. Just let me know when you want me to turn it on and I'll give you the wonderful, surprisingly short URL. You can even select what type of thing you'd like to track!
 
@@ -7,9 +7,8 @@ The best way to view and ✨ _interact_ ✨ with this (when it's on) is at [REDA
 
 ![ezgif-1274c64c35e02c](https://github.com/user-attachments/assets/b6482efa-af75-43d2-b8a4-9d8669c886cb)
 
+## A view of https://ptz.[REDACTED]
 ![image](https://github.com/user-attachments/assets/ab39047e-4f78-4d3d-9d61-f30fef2d1984)
-
-
 
 
 ## Hardware Components
@@ -34,26 +33,26 @@ Picture | Name | Cost
 
 
 ## Software Process
-1. Got some simple oldschool CV working initially to get digital zoom and tracking working without servo movement
-2. Used this simple and speedy setup to get the servos working with a simple proportional controller
-3. Got YOLO working on its own
-4. Integrated YOLO into the tracking
-5.  a
-37. Tuning, tweaking, experimenting
-38. Set up streaming site using Flask & ngrok
+**1.** Got some simple oldschool CV working initially to get digital zoom and tracking working without servo movement  
+**2.** Used this simple and speedy setup to get the servos working with a simple proportional controller  
+**3.** Got YOLO working on its own  
+**4.** Integrated YOLO into the tracking  
+**5–37.** Tuning, tweaking, experimenting  
+**38.** Set up streaming site using Flask & ngrok
 
-
-## Final Architecture & Specs
+## Final Architecture & Specs Summary
+- Choice of object tracked by YOLO (~100ms inference), and OpenCV's TrackerCSRT (~5ms "inference") (the latter is much faster but takes its cue of what to track from YOLO's detection)
+- Pan & Tilt controlled via PID controlled servos
+- Digital zoom aims to keep the width or height of the bbox within at a fixed percent of overall frame, whichever is smaller (also perform optional digital pan here too)
 - 20 FPS tracking on 480 x 320 video
-- Streaming via a flask app
-- digital zoom (with some pan too)
+- Streaming via a Flask app where remote user can choose from a list of maritimey objects to track
 
-
-further improvements
-- ssd, cooler, coral
-- separate threads for each process
-- higher res, 
-- modularize code and neaten
-- add commandeer option to site (remote controls for camera)
-- push model more (quantization, other optimizations)
-- 
+## Things I'd love to do with more time
+- Add an SSD for faster writes, and a cooler as it does get a bit hot
+- Try out the [Coral TPU USB accelerator](https://coral.ai/products/accelerator/)!
+- Separate threads for each process, modularize code and neaten
+- Push to get the highest resolution and highest FPS possible (perfectly following the wide arc of a thrown item would be cool)
+- Add "commandeer" option to site (remotely take of control of the pan, tilt, and zoom for the camera)
+- Squeeze the YOLO model more on the current hardware (quantization, any other optimizations)
+- Explore other models / train my own
+- More realtime details (like the zoom level) and improve aesthetics of site, video, and robot
